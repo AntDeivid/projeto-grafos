@@ -43,11 +43,5 @@ int main() {
     }
     file.close();
 
-    for(int i = 0; i < n; ++i) {
-        cout << "v[" << i << "]: ";
-        for(auto vizinho : grafo[i]) {
-            cout << vizinho << " ";
-        }
-        cout << endl;
-    }
+    
 }

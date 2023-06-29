@@ -4,21 +4,36 @@
 #include <list>
 using namespace std;
 
-bool isBipartite(vector<list<int>> grafo, int start, vector<int>& colors) {
-    list<int> queue;
-    queue.push_back(start);
-    colors[start] = 0;
+bool isBipartite(vector<list<int>> grafo, int start, vector<string>& colors) {
+    list<int> fila;
+    fila.push_back(start);
+    colors[start] = "gray";
 
-    while(!queue.empty()) {
-        int current = queue.front();
-        queue.pop_front();
+    while(!fila.empty()) {
+        int u = fila.front();
+        fila.pop_front();
 
-        for(auto vizinho : grafo[current]) {
-            if(colors[vizinho] == -1) {
-                colors[vizinho] = 1 - colors[current];
-                queue.push_back(vizinho);
+        for(auto v : grafo[u]) {
+            if(colors[v] == "white") {
+                colors[v] = (colors[u] == "gray") ? "black" : "gray";
+                fila.push_back(v);
+            } else if(colors[v] == colors[u]) {
+                return false;
             }
-            else if(colors[vizinho] == colors[current]) { return false; }
+        }
+    }
+    return true;
+}
+
+bool Bipartite(vector<list<int>> grafo) {
+    vector<string> colors;
+    colors.resize(grafo.size(), "white");
+
+    for(int i = 0; i < grafo.size(); i++) {
+        if(colors[i] == "white") {
+            if(!isBipartite(grafo, i, colors)) {
+                return false;
+            }
         }
     }
     return true;
@@ -26,22 +41,29 @@ bool isBipartite(vector<list<int>> grafo, int start, vector<int>& colors) {
 
 int main() {
     fstream file;
-    file.open("SIM/cubic_bipartite_26_vertices.txt");
-    int n, m;
-    file >> n >> m;
-
-    vector<list<int>> grafo;
-    grafo.resize(n);
-
-    int count {m};
-    while(count > 0) {
-        int u, v;
-        file >> u >> v;
-        grafo[u].push_back(v);
-        grafo[v].push_back(u);
-        count--;
-    }
-    file.close();
-
+    file.open("NAO/snarks_28_vertices.txt");
     
+    while (!file.eof()) {
+        int n, m;
+        file >> n >> m;
+
+        vector<list<int>> grafo;
+        grafo.resize(n);
+
+        for(int i = 0; i < m; i++) {
+            int u, v;
+            file >> u >> v;
+            grafo[u].push_back(v);
+            grafo[v].push_back(u);
+        }
+
+        if(Bipartite(grafo)) {
+            cout << "SIM" << endl;
+        } else {
+            cout << "NAO" << endl;
+        }
+    }
+
+    file.close();
+    return 0;
 }

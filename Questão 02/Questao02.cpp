@@ -10,104 +10,87 @@
 using namespace std;
 
 struct Actor {
-    string ator;
-    string filme;
-    int numeroBacon;
+    string name;
+    string movie;
+    int baconNumber;
 };
 
-void encontrarGrauBacon(const unordered_map<string, list<string>>& grafo) {
-    queue<Actor> fila;
-    unordered_map<string, int> grauBacon;
-    unordered_map<string, bool> visitado;
+void findBaconNumber(const unordered_map<string, list<pair<string, string>>>& graph) {
+    queue<Actor> queue;
+    unordered_map<string, bool> visited;
+    unordered_map<string, int> baconNumbers;
 
-    for (const auto& entry : grafo) {
-        grauBacon[entry.first] = -1;
-        visitado[entry.first] = false;
+    for (const auto& entry : graph) {
+        visited[entry.first] = false;
+        baconNumbers[entry.first] = -1;
     }
 
-    vector<Actor> atoresResultantes;
+    vector<Actor> actors;
 
-    for (const auto& entry : grafo) {
-        string ator = entry.first;
+    for (const auto& entry : graph) {
+        string actor = entry.first;
 
-        fila.push({ator, "", 0});
-        visitado[ator] = true;
-        grauBacon[ator] = 0;
+        queue.push({ actor, "", -1 });
+        visited[actor] = true;
+        baconNumbers[actor] = 1;
 
-        while (!fila.empty()) {
-            Actor atorAtual = fila.front();
-            fila.pop();
+        while (!queue.empty()) {
+            Actor current = queue.front();
+            queue.pop();
 
-            string atorAtualNome = atorAtual.ator;
-            int grauAtual = atorAtual.numeroBacon;
+            if (current.name != actor) {
+                actors.push_back(current);
+            }
 
-            for (const auto& filme : grafo.at(atorAtualNome)) {
-                string atorVizinho = filme;
-                if (!visitado[atorVizinho]) {
-                    visitado[atorVizinho] = true;
-                    grauBacon[atorVizinho] = grauAtual + 1;
-                    fila.push({atorVizinho, filme, grauAtual + 1});
+            for (const auto& coactor : graph.at(current.name)) {
+                string nextActor = coactor.first;
+                string movie = coactor.second;
+
+                if (!visited[nextActor]) {
+                    queue.push({ nextActor, movie, current.baconNumber + 1 });
+                    visited[nextActor] = true;
+                    baconNumbers[nextActor] = current.baconNumber + 1;
                 }
             }
         }
-
-        for (const auto& entry : grauBacon) {
-            atoresResultantes.push_back({entry.first, "", entry.second});
-        }
-
-        grauBacon.clear();
-        for (const auto& entry : grafo) {
-            grauBacon[entry.first] = -1;
-            visitado[entry.first] = false;
-        }
-
-        sort(atoresResultantes.begin(), atoresResultantes.end(), [](const Actor& a, const Actor& b) {
-            return a.ator < b.ator;
-        });
-
     }
 
-    for (const auto& ator : atoresResultantes) {
-        cout << "O numero de Bacon de " << ator.ator << " e " << ator.numeroBacon << " pelo filme " << ator.filme << endl;
+    sort(actors.begin(), actors.end(), [](const Actor& a, const Actor& b) {
+        return a.name < b.name;
+    });
+
+    for (const auto& actor : actors) {
+        cout << "O numero de Bacon de " << actor.name << " e " << actor.baconNumber << " pelo filme " << actor.movie << endl;
     }
 }
 
 int main() {
-    ifstream arquivo("input.txt");
-    if (!arquivo.is_open()) {
+    ifstream file("input.txt");
+    if (!file.is_open()) {
         cout << "Erro ao abrir o arquivo" << endl;
         return 0;
     }
 
-    unordered_map<string, list<string>> grafo;
+    unordered_map<string, list<pair<string, string>>> graph;
 
-    string linha;
+    string line;
+    while (getline(file, line)) {
+        string actor, movie, coactor;
 
-    while (getline(arquivo, linha)) {
-        string ator, filme, coautor;
+        size_t firstDelimiter = line.find(';');
+        size_t secondDelimiter = line.find(';', firstDelimiter + 1);
 
-        int pos = linha.find(";");
-        int pos2 = linha.rfind(";");
+        actor = line.substr(0, firstDelimiter);
+        movie = line.substr(firstDelimiter + 1, secondDelimiter - firstDelimiter - 1);
+        coactor = line.substr(secondDelimiter + 1);
 
-        ator = linha.substr(0, pos);
-        filme = linha.substr(pos + 1, pos2 - pos - 1);
-        coautor = linha.substr(pos2 + 1);
-
-        if (grafo.find(ator) == grafo.end()) {
-            grafo[ator] = list<string>();
-        }
-        grafo[ator].push_back(coautor);
-
-        if (grafo.find(coautor) == grafo.end()) {
-            grafo[coautor] = list<string>();
-        }
-        grafo[coautor].push_back(ator);
+        graph[actor].push_back({ coactor, movie });
+        graph[coactor].push_back({ actor, movie });
     }
 
-    arquivo.close();
+    file.close();
 
-    encontrarGrauBacon(grafo);
+    findBaconNumber(graph);
 
     return 0;
-    
 }

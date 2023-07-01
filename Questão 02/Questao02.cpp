@@ -27,30 +27,26 @@ void findBaconNumber(const unordered_map<string, list<pair<string, string>>>& gr
 
     vector<Actor> actors;
 
-    for (const auto& entry : graph) {
-        string actor = entry.first;
+    queue.push({ "Kevin Bacon", "", 0 });
+    visited["Kevin Bacon"] = true;
+    baconNumbers["Kevin Bacon"] = 0;
 
-        queue.push({ actor, "", -1 });
-        visited[actor] = true;
-        baconNumbers[actor] = 1;
+    while (!queue.empty()) {
+        Actor current = queue.front();
+        queue.pop();
 
-        while (!queue.empty()) {
-            Actor current = queue.front();
-            queue.pop();
+        if (current.name != "Kevin Bacon") {
+            actors.push_back(current);
+        }
 
-            if (current.name != actor) {
-                actors.push_back(current);
-            }
+        for (const auto& coactor : graph.at(current.name)) {
+            string nextActor = coactor.first;
+            string movie = coactor.second;
 
-            for (const auto& coactor : graph.at(current.name)) {
-                string nextActor = coactor.first;
-                string movie = coactor.second;
-
-                if (!visited[nextActor]) {
-                    queue.push({ nextActor, movie, current.baconNumber + 1 });
-                    visited[nextActor] = true;
-                    baconNumbers[nextActor] = current.baconNumber + 1;
-                }
+            if (!visited[nextActor]) {
+                queue.push({ nextActor, movie, current.baconNumber + 1 });
+                visited[nextActor] = true;
+                baconNumbers[nextActor] = current.baconNumber + 1;
             }
         }
     }

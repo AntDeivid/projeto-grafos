@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "list": "cpp"
+        "list": "cpp",
+        "xstring": "cpp",
+        "vector": "cpp",
+        "unordered_map": "cpp"
     }
 }

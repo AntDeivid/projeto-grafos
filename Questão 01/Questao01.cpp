@@ -4,7 +4,7 @@
 #include <list>
 using namespace std;
 
-bool isBipartite(vector<list<int>> grafo, int start, vector<string>& colors) {
+bool isValidGraphColor(vector<list<int>> grafo, int start, vector<string>& colors) {
     list<int> fila;
     fila.push_back(start);
     colors[start] = "gray";
@@ -25,13 +25,13 @@ bool isBipartite(vector<list<int>> grafo, int start, vector<string>& colors) {
     return true;
 }
 
-bool Bipartite(vector<list<int>> grafo) {
+bool validGraphColor(vector<list<int>> grafo) {
     vector<string> colors;
     colors.resize(grafo.size(), "white");
 
     for(int i = 0; i < grafo.size(); i++) {
         if(colors[i] == "white") {
-            if(!isBipartite(grafo, i, colors)) {
+            if(!isValidGraphColor(grafo, i, colors)) {
                 return false;
             }
         }
@@ -57,7 +57,7 @@ int main() {
             grafo[v].push_back(u);
         }
 
-        if(Bipartite(grafo)) {
+        if(validGraphColor(grafo)) {
             cout << "SIM" << endl;
         } else {
             cout << "NAO" << endl;

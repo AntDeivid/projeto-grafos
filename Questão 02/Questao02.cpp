@@ -38,6 +38,7 @@ void findBaconNumber(const unordered_map<string, list<pair<string, string>>>& gr
         /*if (current.name != "Kevin Bacon") {
             actors.push_back(current);
         }*/
+        
         actors.push_back(current);
 
         for (const auto& coactor : graph.at(current.name)) {
